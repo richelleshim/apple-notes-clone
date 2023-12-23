@@ -20,7 +20,6 @@ export const App = () => {
   });
 
   if (notes === undefined) return null;
-  // Fri Dec 22, 5:00 AM
 
   return (
     <Stack spacing={3}>
@@ -30,7 +29,10 @@ export const App = () => {
             <Typography level="body-xs" alignItems={"Center"}>
               {format(note.created, "MMM d, yyyy HH:mm:ss")}
             </Typography>
+            <Stack direction="column">
             <Typography level="h3">{note.title}</Typography>
+            <img src={note.image()} alt="image"></img>
+            </Stack>
             <Typography> {note.body} </Typography>
           </Stack>
         );
