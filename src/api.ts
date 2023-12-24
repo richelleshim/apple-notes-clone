@@ -2,10 +2,6 @@ import { db } from "./global";
 import { collection, getDocs } from "firebase/firestore";
 import { z } from "zod";
 
-//Modify current notes type to include an image 
-//implement tags (?)
-
-
 const DateSchema = z
   .object({ seconds: z.number(), nanoseconds: z.number() })
   .transform(({ seconds }) => {
@@ -14,13 +10,14 @@ const DateSchema = z
 
 type DateSchema = z.infer<typeof DateSchema>;
 
-
 const NoteSchema = z.object({
   title: z.string(),
   body: z.string(),
   created: DateSchema,
   image: z.string(),
+  tags: z.array(z.string()),
 });
+
 type NoteSchema = z.infer<typeof NoteSchema>;
 
 export type Note = NoteSchema;
@@ -32,3 +29,9 @@ export const getNotes = async () => {
   });
   return notes;
 };
+
+
+
+export const useNotes = () => {
+  
+}
