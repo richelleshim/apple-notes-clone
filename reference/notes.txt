@@ -1,0 +1,52 @@
+// in order to fix this issue: if we have a selectedNote, we don't want to
+// selectedNote has an id and we want to find the same note
+// if we find that note, we want to set the seeleced note to that one
+// if we don't find, then we set to top
+
+// edit
+// A, B, C
+// select note B
+// edit note B
+// A, B*, C
+// we want to display B*
+
+// delete
+// A, B, C
+// select note B
+// delete note B
+// A, C
+//
+// if we delete B : [A, C],
+// we want to display A
+
+//go through notes and try to find the id for the selected note
+// if you find, set... if you don't
+
+// id: 1, title: abc
+
+// id: 1, title: xyz
+
+//if selectednote is null defaul
+
+// sortedNotes && setSelectedNote(sortedNotes[0]);
+
+// if sortedNotes is null, do nothing
+
+// sortedNotes && sortedNotes.map((note) => {
+//   if (selectedNote !== null) {
+//     if (note.id === selectedNote.id)
+//       setSelectedNote(note);
+//   }
+//   setSelectedNote(sortedNotes[0])
+// })
+
+// look through the sortedNotes and once you find the id... set it as the selectedNote
+// if (sortedNotes) setSelectedNote(sortedNotes[0]);
+// if selectedNote is null
+// useEffect(() => {
+//   if (sortedNotes === null || sortedNotes.length === 0 ) return
+
+//   const newSelectedNote = sortedNotes.find(note => note.id === selectedNote?.id) ?? sortedNotes[0]
+//   setSelectedNote(newSelectedNote)
+
+// }, [sortedNotes])

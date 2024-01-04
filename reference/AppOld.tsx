@@ -1,8 +1,29 @@
 import useSWR from "swr";
-import { getNotes, Note } from "./api";
-import { Stack, Typography, Box, Chip, Checkbox } from "@mui/joy";
+import {
+  getNotes,
+  Note,
+  createNote,
+  Folder,
+  getFolder,
+  createFolder,
+} from "./api";
+import {
+  Stack,
+  Typography,
+  Box,
+  Chip,
+  Checkbox,
+  Button,
+  Input,
+  Textarea,
+} from "@mui/joy";
 import { useEffect, useState } from "react";
-import { CheckBox, NoteAdd, EditNote } from "@mui/icons-material";
+import {
+  CheckBox,
+  NoteAdd,
+  EditNote,
+  CreateNewFolder,
+} from "@mui/icons-material";
 import { format } from "date-fns";
 
 const randomInteger = (min: number, max: number) => {
@@ -27,18 +48,26 @@ type TagChipProp = {
 // never setColor
 // [color, setColor]
 
-// read note
+// read note ✅
 
 // next up:
-// subscription
-// select note editing
+// subscription SKIP
+// select note editing ✅
 // create new notes
 
 // delete notes
 // update notes
 
-// folders
+const x = [1, 2];
 
+// const newNote = {
+//   ...editNote,
+//   tags: v
+// }
+//make it sorted by create Date ✅
+//tags have new tagUpdate box....
+
+// folders
 
 const TagChip = ({ tag }: TagChipProp) => {
   const [variant, setVariant] = useState<"solid" | "soft">("soft");
@@ -72,55 +101,196 @@ const TagChip = ({ tag }: TagChipProp) => {
   );
 };
 
-
-
 export const App = () => {
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  const [editNote, setEditNote] = useState<Note | null>(null);
+  const [editTag, setEditTag] = useState<string>("");
+
+  // const [selectedFolder, setSelectedFolder] = useState("Notes");
+  // const [editFolder, setEditFolder] = useState<Folder | null>(null);
 
   const {
     data: notes,
     isLoading,
     isValidating,
+    mutate,
   } = useSWR("notes", async () => {
     const notes = await getNotes();
     return notes;
   });
 
+  // const {
+  //   data: folder,
+  // } = useSWR("folder", async () => {
+  //   const folder = await getFolder();
+  //   return folder;
+  // });
+
   // when notes goes from undefined to array of notes
   // then we want to set selectedNote to the first note in the array
-  useEffect( () => {
-    if (notes) // typeguard 
-     setSelectedNote(notes[0]);
-  }, [notes])
+  useEffect(() => {
+    if (notes)
+      // typeguard
+      setSelectedNote(notes[0]);
+  }, [notes]);
 
-  if (notes === undefined) return null;
+  // useEffect(() => {
+  //   if (tags)
+  //     setEditTag()
+  // })
+
+  // you need a key here too :e(
+  // inside this stac k<FKL :DDSvFDJKNSL: SORRY SORRY POO
+  // no errors now :)
+  // yay !
+
   return (
-    <Stack spacing={3}>
-      {notes.map((note, noteIndex) => {
-        // you need a key here too :(
-        // inside this stac k<FKL :DDSvFDJKNSL: SORRY SORRY POO
-        // no errors now :)
-        //yay !
-        return (
-          <Stack spacing={0.1} key={noteIndex}>
+    <Stack direction="row" spacing={3}>
+      {
+      /* <Stack>
+          <Button
+            variant="soft"
+            onClick={(() => {
+              const newFolder: folder = {
+              name: "",
+              notes: [], 
+              };
+              setEditFolder(newFolder);
+            })}> <CreateNewFolder/>
+           </Button>
+        </Stack>
+        */
+      }
+
+      <Stack spacing={1}>
+        <Button
+          variant="soft"
+          onClick={() => {
+            const newNote: Note = {
+              title: "",
+              body: "",
+              created: new Date(),
+              image:
+                "https://i.pinimg.com/736x/99/51/a8/9951a87de4d75916aeab4abf0817754d.jpg",
+              tags: [],
+            };
+            setEditNote(newNote);
+          }}
+        >
+          <EditNote />
+        </Button>
+        {notes &&
+          notes.sort((a, b) => b.created.getTime() - a.created.getTime()) && //stack overflow...
+          notes.map((note) => {
+            return (
+              <Button
+                variant="soft"
+                onClick={() => {
+                  setSelectedNote(note);
+                  setEditTag("");
+                  setEditNote(null);
+                }}
+              >
+                {note.title}
+              </Button>
+            );
+          })}
+      </Stack>
+      {editNote ? (
+        <Stack spacing={0.5}>
+          <Input
+            value={editNote.title}
+            size="lg"
+            onChange={(event) => {
+              const text = event.target.value;
+              const newEditNote: Note = {
+                ...editNote,
+                title: text,
+              };
+              setEditNote(newEditNote);
+            }}
+          />
+          <Textarea
+            value={editNote.body}
+            minRows={4}
+            onChange={(event) => {
+              const text = event.target.value;
+              const newEditNote: Note = {
+                ...editNote,
+                body: text,
+              };
+              setEditNote(newEditNote);
+            }}
+          />
+
+          <Stack direction="row" spacing={2}>
+            <Input>
+              <Textarea
+                value={editNote.tags}
+                onChange={(event) => {
+                  const newTag = event.target.value;
+                  const newEditNote: Note = {
+                    ...editNote,
+                    tags: [newTag, ...editNote.tags],
+                  };
+                  setEditTag(newEditNote.tags[0]);
+                }}
+              />
+            </Input>
+            <Button
+              variant="soft"
+              onClick={() => {
+              
+                //   const newEditNote: Note = {
+                //     ...editNote,
+                //     tags: [newTag, ...editNote.tags],
+                //   };
+                //   setEditTag(newEditNote.tags[0]);
+                // }
+                // setEditNote(newEditNote);
+                setEditTag("");
+              }}
+            >
+              +tag
+            </Button>
+          </Stack>
+
+          <Button
+            onClick={async () => {
+              await createNote(editNote), await mutate();
+              setEditNote(null);
+            }}
+          >
+            Save
+          </Button>
+        </Stack>
+      ) : (
+        selectedNote && (
+          <Stack spacing={0.1}>
             <Typography level="body-xs" alignItems={"Center"}>
-              {format(note.created, "MMM d, yyyy HH:mm:ss")}
+              {format(selectedNote.created, "MMM d, yyyy HH:mm:ss")}
             </Typography>
             <Stack direction="row" alignItems={"center"} spacing={1}>
-              <Typography level="h3">{note.title}</Typography>
+              <Typography level="h3">{selectedNote.title}</Typography>
               {/* <Box border="1px solid black" borderRadius={5}>  */}
-              <img src={note.image} alt="image" width="20px" height="20px" />
+              <img
+                src={selectedNote.image}
+                alt="image"
+                width="20px"
+                height="20px"
+              />
             </Stack>
             <Stack direction="row" spacing={0.5}>
-              {note.tags.map((tag, tagIndex) => {
+              {selectedNote.tags.map((tag, tagIndex) => {
                 // key goes inside the chip
                 // ?
                 return <TagChip key={tagIndex} tag={tag} />;
               })}
             </Stack>
-            <Typography>{note.body}</Typography>
+            <Typography>{selectedNote.body}</Typography>
           </Stack>
-        );
+        )
+      )}
     </Stack>
   );
 };
